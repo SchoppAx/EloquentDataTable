@@ -342,11 +342,12 @@ class DataTable
     protected function addAllFilter($search, $regex, $aggregate)
     {
         $method = $aggregate ? 'Having' : 'Where';
+        $columns = $aggregate ? $this->columnNames : $this->columns;  
         $this->builder = $this->builder->{strtolower($method)}(
-            function ($query) use ($search, $regex, $method) {
-                foreach ($this->columns as $column) {
+            function ($query) use ($search, $regex, $method, $columns, $aggregate) {
+                foreach ($columns as $column) {
                     $query->{"or$method"}(
-                        new raw($this->getRawColumnQuery($column)),
+                      new raw($aggregate ? $column : $this->getRawColumnQuery($column)),
                         $regex ? 'rlike' : 'like',
                         $regex ? $search : '%' . $search . '%'
                     );
@@ -360,12 +361,13 @@ class DataTable
      */
     protected function addColumnFilters($aggregate)
     {
-        foreach ($this->columns as $i => $column) {
+        $columns = $aggregate ? $this->columnNames : $this->columns;
+        foreach ($columns as $i => $column) {
             if (static::$versionTransformer->isColumnSearched($i)) {
                 $regex = static::$versionTransformer->isColumnSearchRegex($i);
                 $method = $aggregate ? 'having' : 'where';
                 $this->builder->{$method}(
-                    new raw($this->getRawColumnQuery($column)),
+                    new raw($aggregate ? $column : $this->getRawColumnQuery($column)),
                     $regex ? 'rlike' : 'like',
                     $regex ? static::$versionTransformer->getColumnSearchValue($i) : '%' . static::$versionTransformer->getColumnSearchValue($i) . '%'
                 );
