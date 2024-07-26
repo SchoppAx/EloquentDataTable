@@ -5,6 +5,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression as raw;
+use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Support\Str;
 use LiveControl\EloquentDataTable\VersionTransformers\Version110Transformer;
 use LiveControl\EloquentDataTable\VersionTransformers\VersionTransformerContract;
@@ -248,7 +249,8 @@ class DataTable
     protected function getRawColumnQuery($column)
     {
         if ($column instanceof ExpressionWithName) {
-            return $column->getExpression();
+            $gramma = new Grammar();
+            return $column->getExpression()->getValue($gramma);
         }
 
         if (is_array($column)) {
