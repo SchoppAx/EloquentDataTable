@@ -249,7 +249,7 @@ class DataTable
     protected function getRawColumnQuery($column)
     {
         if ($column instanceof ExpressionWithName) {
-            $gramma = new Grammar();
+            $gramma = Model::resolveConnection()->getQueryGrammar();
             return $column->getExpression()->getValue($gramma);
         }
 
